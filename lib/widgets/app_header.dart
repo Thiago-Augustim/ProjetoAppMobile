@@ -22,15 +22,23 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         children: [
           const Text('Study Focus'),
           const SizedBox(height: 20),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              title,
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
           ),
           if (subtitle != null) ...[
             const SizedBox(height: 2),
-            Text(
-              subtitle!,
-              style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 14),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                subtitle!,
+                style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 14),
+              ),
             ),
           ],
         ],

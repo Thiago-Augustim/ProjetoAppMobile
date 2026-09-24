@@ -1,0 +1,92 @@
+import 'package:flutter/material.dart';
+
+class PomodoroActionButtons extends StatelessWidget {
+  const PomodoroActionButtons({
+    required this.isRunning,
+    required this.onStartPause,
+    required this.onReset,
+    super.key,
+  });
+
+  final bool isRunning;
+  final VoidCallback onStartPause;
+  final VoidCallback onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = Theme.of(context).colorScheme.primary;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Row(
+        children: [
+          // Reiniciar button
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: onReset,
+                icon: const Icon(
+                  Icons.replay_rounded,
+                  size: 20,
+                  color: Color(0xFF334155),
+                ),
+                label: const Text(
+                  'Reiniciar',
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF334155),
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF334155),
+                  elevation: 0,
+                  side: BorderSide(color: Colors.grey.shade300),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  shadowColor: Colors.black.withValues(alpha: 0.06),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+
+          // Iniciar / Pausar button
+          Expanded(
+            child: SizedBox(
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: onStartPause,
+                icon: Icon(
+                  isRunning ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                  size: 22,
+                  color: Colors.white,
+                ),
+                label: Text(
+                  isRunning ? 'Pausar' : 'Iniciar',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: primaryColor,
+                  foregroundColor: Colors.white,
+                  elevation: 2,
+                  shadowColor: primaryColor.withValues(alpha: 0.4),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

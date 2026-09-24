@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/tarefas_controller.dart';
+import '../core/app_state.dart';
 import '../models/tarefa.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
+import '../widgets/nova_tarefa_dialog.dart';
 import '../widgets/tarefa_card.dart';
 import '../widgets/tarefa_filters.dart';
-import '../widgets/nova_tarefa_dialog.dart';
 
 class TarefasPage extends StatefulWidget {
   const TarefasPage({super.key});
@@ -15,116 +17,91 @@ class TarefasPage extends StatefulWidget {
 }
 
 class _TarefasPageState extends State<TarefasPage> {
-  final List<Tarefa> _tarefas = [];
-  FiltroStatus _filtroStatus = FiltroStatus.todas;
-  FiltroPrioridade _filtroPrioridade = FiltroPrioridade.todas;
+  TarefasController? _controller;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final newController = AppState.of(context).tarefasController;
+    if (_controller != newController) {
+      _controller?.removeListener(_rebuild);
+      _controller = newController;
+      _controller!.addListener(_rebuild);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.removeListener(_rebuild);
+    super.dispose();
+  }
+
+  void _rebuild() => setState(() {});
 
   Future<void> _adicionarTarefa() async {
     final tarefa = await showDialog<Tarefa>(
       context: context,
       builder: (_) => const NovaTarefaDialog(),
     );
-
     if (tarefa != null && mounted) {
-      setState(() {
-        _tarefas.add(tarefa);
-      });
+      _controller!.adicionar(tarefa);
     }
-  }
-
-  void _alternarStatus(Tarefa tarefa, bool? concluida) {
-    setState(() {
-      tarefa.concluida = concluida ?? false;
-    });
-  }
-
-  String get _resumoTarefasEncontradas {
-    final quantidade = _tarefasFiltradas.length;
-    final textoTarefa = quantidade == 1 ? 'tarefa' : 'tarefas';
-
-    return '$quantidade $textoTarefa encontradas';
-  }
-
-  List<Tarefa> get _tarefasFiltradas {
-    return _tarefas.where((tarefa) {
-      final correspondeAoStatus = switch (_filtroStatus) {
-        FiltroStatus.todas => true,
-        FiltroStatus.pendentes => !tarefa.concluida,
-        FiltroStatus.concluidas => tarefa.concluida,
-      };
-      final correspondeAPrioridade = switch (_filtroPrioridade) {
-        FiltroPrioridade.todas => true,
-        FiltroPrioridade.alta => tarefa.prioridade == Prioridade.alta,
-        FiltroPrioridade.media => tarefa.prioridade == Prioridade.media,
-        FiltroPrioridade.baixa => tarefa.prioridade == Prioridade.baixa,
-      };
-
-      return correspondeAoStatus && correspondeAPrioridade;
-    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
+    final controller = _controller!;
+
     return Scaffold(
-      appBar: AppHeader(title: 'Tarefas', subtitle: _resumoTarefasEncontradas),
+      appBar: AppHeader(
+        title: 'Tarefas',
+        subtitle: controller.resumo,
+      ),
       body: Column(
         children: [
           const SizedBox(height: 20),
           TarefaFilters(
-            status: _filtroStatus,
-            prioridade: _filtroPrioridade,
-            onStatusChanged: (status) {
-              setState(() {
-                _filtroStatus = status;
-              });
-            },
-            onPrioridadeChanged: (prioridade) {
-              setState(() {
-                _filtroPrioridade = prioridade;
-              });
-            },
+            status: controller.filtroStatus,
+            prioridade: controller.filtroPrioridade,
+            onStatusChanged: controller.setFiltroStatus,
+            onPrioridadeChanged: controller.setFiltroPrioridade,
           ),
           const SizedBox(height: 8),
           Expanded(
-            child: _tarefas.isEmpty
+            child: controller.estaVazio
                 ? const Center(child: Text('Nenhuma tarefa cadastrada'))
-                : _tarefasFiltradas.isEmpty
-                ? const Center(child: Text('Nenhuma tarefa encontrada'))
-                : ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
-                    itemCount: _tarefasFiltradas.length,
-                    itemBuilder: (context, index) {
-                      final tarefa = _tarefasFiltradas[index];
-
-                      return Dismissible(
-                        key: ObjectKey(tarefa),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.only(right: 24),
-                          decoration: BoxDecoration(
-                            color: Colors.red,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Icon(
-                            Icons.delete_forever,
-                            color: Colors.white,
-                          ),
-                        ),
-                        onDismissed: (_) {
-                          setState(() {
-                            _tarefas.remove(tarefa);
-                          });
+                : controller.tarefasFiltradas.isEmpty
+                    ? const Center(child: Text('Nenhuma tarefa encontrada'))
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 96),
+                        itemCount: controller.tarefasFiltradas.length,
+                        itemBuilder: (context, index) {
+                          final tarefa = controller.tarefasFiltradas[index];
+                          return Dismissible(
+                            key: ObjectKey(tarefa),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              margin: const EdgeInsets.only(bottom: 12),
+                              padding: const EdgeInsets.only(right: 24),
+                              decoration: BoxDecoration(
+                                color: Colors.red,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.delete_forever,
+                                color: Colors.white,
+                              ),
+                            ),
+                            onDismissed: (_) => controller.remover(tarefa),
+                            child: TarefaCard(
+                              tarefa: tarefa,
+                              onStatusChanged: (value) =>
+                                  controller.alternarStatus(tarefa, value),
+                            ),
+                          );
                         },
-                        child: TarefaCard(
-                          tarefa: tarefa,
-                          onStatusChanged: (value) =>
-                              _alternarStatus(tarefa, value),
-                        ),
-                      );
-                    },
-                  ),
+                      ),
           ),
         ],
       ),

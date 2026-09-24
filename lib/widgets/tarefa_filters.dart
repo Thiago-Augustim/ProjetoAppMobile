@@ -21,7 +21,7 @@ class TarefaFilters extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _SegmentedFilter<FiltroStatus>(
           selected: status,
@@ -67,31 +67,38 @@ class _SegmentedFilter<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: SegmentedButton<T>(
-        showSelectedIcon: false,
-        style: ButtonStyle(
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            return states.contains(WidgetState.selected)
-                ? Color.lerp(
-                    Theme.of(context).colorScheme.primary,
-                    Colors.white,
-                    0.15,
-                  )!
-                : Colors.white;
-          }),
-          foregroundColor: WidgetStateProperty.resolveWith((states) {
-            return states.contains(WidgetState.selected)
-                ? Colors.white
-                : Colors.black87;
-          }),
-          side: WidgetStatePropertyAll(BorderSide(color: Colors.grey.shade300)),
+    return Center(
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: SegmentedButton<T>(
+          showSelectedIcon: false,
+          style: ButtonStyle(
+            shape: WidgetStatePropertyAll(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            backgroundColor: WidgetStateProperty.resolveWith((states) {
+              return states.contains(WidgetState.selected)
+                  ? Color.lerp(
+                      Theme.of(context).colorScheme.primary,
+                      Colors.white,
+                      0.15,
+                    )!
+                  : Colors.white;
+            }),
+            foregroundColor: WidgetStateProperty.resolveWith((states) {
+              return states.contains(WidgetState.selected)
+                  ? Colors.white
+                  : Colors.black87;
+            }),
+            side: WidgetStatePropertyAll(
+              BorderSide(color: Colors.grey.shade300),
+            ),
+          ),
+          segments: segments,
+          selected: {selected},
+          onSelectionChanged: (selection) => onChanged(selection.first),
         ),
-        segments: segments,
-        selected: {selected},
-        onSelectionChanged: (selection) => onChanged(selection.first),
       ),
     );
   }
