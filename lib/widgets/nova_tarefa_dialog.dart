@@ -13,12 +13,25 @@ class _NovaTarefaDialogState extends State<NovaTarefaDialog> {
   final _tituloController = TextEditingController();
   final _materiaController = TextEditingController();
   Prioridade _prioridade = Prioridade.media;
+  DateTime? _prazo;
 
   @override
   void dispose() {
     _tituloController.dispose();
     _materiaController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selecionarPrazo() async {
+    final selecionada = await showDatePicker(
+      context: context,
+      initialDate: _prazo ?? DateTime.now(),
+      firstDate: DateTime.now().subtract(const Duration(days: 1)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
+    );
+    if (selecionada != null) {
+      setState(() => _prazo = selecionada);
+    }
   }
 
   void _salvar() {
@@ -32,6 +45,7 @@ class _NovaTarefaDialogState extends State<NovaTarefaDialog> {
         titulo: _tituloController.text.trim(),
         materia: _materiaController.text.trim(),
         prioridade: _prioridade,
+        prazo: _prazo,
       ),
     );
   }
@@ -97,6 +111,25 @@ class _NovaTarefaDialogState extends State<NovaTarefaDialog> {
                     });
                   }
                 },
+              ),
+              const SizedBox(height: 8),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.event_outlined),
+                title: Text(
+                  _prazo == null
+                      ? 'Sem prazo definido'
+                      : 'Prazo: ${_prazo!.day.toString().padLeft(2, '0')}/'
+                          '${_prazo!.month.toString().padLeft(2, '0')}/'
+                          '${_prazo!.year}',
+                ),
+                trailing: _prazo == null
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => setState(() => _prazo = null),
+                      ),
+                onTap: _selecionarPrazo,
               ),
             ],
           ),

@@ -41,6 +41,25 @@ class TarefasController extends ChangeNotifier {
     return '$quantidade $texto encontradas';
   }
 
+  // ── Resumo para o Dashboard (Home) ────────────────────────────────────────
+
+  int get pendentesCount => _tarefas.where((t) => !t.concluida).length;
+
+  int get concluidasCount => _tarefas.where((t) => t.concluida).length;
+
+  int get urgentesCount => _tarefas
+      .where((t) => !t.concluida && t.prioridade == Prioridade.alta)
+      .length;
+
+  /// Tarefas pendentes com prazo definido, ordenadas pelas mais próximas.
+  List<Tarefa> proximosPrazos({int limite = 5}) {
+    final comPrazo = _tarefas
+        .where((t) => !t.concluida && t.prazo != null)
+        .toList()
+      ..sort((a, b) => a.prazo!.compareTo(b.prazo!));
+    return comPrazo.take(limite).toList();
+  }
+
   // ── Ações públicas ─────────────────────────────────────────────────────────
 
   void adicionar(Tarefa tarefa) {
