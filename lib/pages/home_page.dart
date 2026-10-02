@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../controllers/pomodoro_controller.dart';
+import '../controllers/provas_controller.dart';
 import '../controllers/tarefas_controller.dart';
 import '../core/app_state.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
+import '../widgets/home_proxima_prova_tile.dart';
 import '../widgets/home_proximo_prazo_tile.dart';
 import '../widgets/home_stat_card.dart';
 
@@ -18,6 +20,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TarefasController? _tarefasController;
   PomodoroController? _pomodoroController;
+  ProvasController? _provasController;
 
   @override
   void didChangeDependencies() {
@@ -35,12 +38,19 @@ class _HomePageState extends State<HomePage> {
       _pomodoroController = appState.pomodoroController;
       _pomodoroController!.addListener(_rebuild);
     }
+
+    if (_provasController != appState.provasController) {
+      _provasController?.removeListener(_rebuild);
+      _provasController = appState.provasController;
+      _provasController!.addListener(_rebuild);
+    }
   }
 
   @override
   void dispose() {
     _tarefasController?.removeListener(_rebuild);
     _pomodoroController?.removeListener(_rebuild);
+    _provasController?.removeListener(_rebuild);
     super.dispose();
   }
 
@@ -87,7 +97,9 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final tarefas = _tarefasController!;
     final pomodoro = _pomodoroController!;
+    final provas = _provasController!;
     final proximosPrazos = tarefas.proximosPrazos();
+    final proximasProvas = provas.proximas();
 
     return Scaffold(
       appBar: const AppHeader(title: 'Início'),
@@ -157,10 +169,19 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 16),
           _SectionCard(
             titulo: 'Próximas Provas',
-            child: const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12),
-              child: Text('Nenhuma prova cadastrada'),
-            ),
+            child: proximasProvas.isEmpty
+                ? const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    child: Text('Nenhuma prova cadastrada'),
+                  )
+                : Column(
+                    children: [
+                      for (var i = 0; i < proximasProvas.length; i++) ...[
+                        if (i > 0) const Divider(height: 1),
+                        HomeProximaProvaTile(prova: proximasProvas[i]),
+                      ],
+                    ],
+                  ),
           ),
           const SizedBox(height: 16),
           _SectionCard(
