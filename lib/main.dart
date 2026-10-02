@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'controllers/pomodoro_controller.dart';
+import 'controllers/provas_controller.dart';
 import 'controllers/tarefas_controller.dart';
 import 'core/app_routes.dart';
 import 'core/app_state.dart';
@@ -25,11 +26,13 @@ class _StudyAppState extends State<StudyApp> {
   // Controllers criados uma vez e descartados apenas quando o app fecha.
   final _pomodoroController = PomodoroController();
   final _tarefasController = TarefasController();
+  final _provasController = ProvasController();
 
   @override
   void dispose() {
     _pomodoroController.dispose();
     _tarefasController.dispose();
+    _provasController.dispose();
     super.dispose();
   }
 
@@ -38,6 +41,7 @@ class _StudyAppState extends State<StudyApp> {
     return AppState(
       pomodoroController: _pomodoroController,
       tarefasController: _tarefasController,
+      provasController: _provasController,
       child: MaterialApp(
         title: 'App Estudos',
         debugShowCheckedModeBanner: false,

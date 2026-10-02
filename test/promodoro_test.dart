@@ -1,4 +1,5 @@
 import 'package:appestudos/controllers/pomodoro_controller.dart';
+import 'package:appestudos/controllers/provas_controller.dart';
 import 'package:appestudos/controllers/tarefas_controller.dart';
 import 'package:appestudos/core/app_state.dart';
 import 'package:appestudos/core/app_theme.dart';
@@ -9,10 +10,12 @@ import 'package:flutter_test/flutter_test.dart';
 Widget createTestWidget({
   PomodoroController? pomodoroController,
   TarefasController? tarefasController,
+  ProvasController? provasController,
 }) {
   return AppState(
     pomodoroController: pomodoroController ?? PomodoroController(),
     tarefasController: tarefasController ?? TarefasController(),
+    provasController: provasController ?? ProvasController(),
     child: MaterialApp(
       theme: AppTheme.light(),
       home: const PromodoroPage(),
