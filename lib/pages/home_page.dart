@@ -108,9 +108,8 @@ class _HomePageState extends State<HomePage> {
         children: [
           Text(
             'Bom dia! 👋',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context).textTheme.headlineSmall
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 2),
           Text(_dataDeHoje, style: TextStyle(color: Colors.blueGrey.shade300)),
@@ -151,7 +150,7 @@ class _HomePageState extends State<HomePage> {
           ),
           const SizedBox(height: 24),
           _SectionCard(
-            titulo: 'Próximos Prazos',
+            titulo: 'Próximas tarefas',
             child: proximosPrazos.isEmpty
                 ? const Padding(
                     padding: EdgeInsets.symmetric(vertical: 12),

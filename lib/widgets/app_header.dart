@@ -7,7 +7,7 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   final String? subtitle;
 
   @override
-  Size get preferredSize => const Size.fromHeight(96);
+  Size get preferredSize => const Size.fromHeight(72);
 
   @override
   Widget build(BuildContext context) {
@@ -20,8 +20,6 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text('Study Focus'),
-          const SizedBox(height: 20),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -43,6 +41,16 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
           ],
         ],
       ),
+      actions: [
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: Image.asset(
+            'lib/img/StudyFocus.png',
+            height: 48,
+            fit: BoxFit.contain,
+          ),
+        ),
+      ],
     );
   }
 }
