@@ -78,22 +78,27 @@ class _SegmentedFilter<T> extends StatelessWidget {
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
             backgroundColor: WidgetStateProperty.resolveWith((states) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
               return states.contains(WidgetState.selected)
                   ? Color.lerp(
                       Theme.of(context).colorScheme.primary,
                       Colors.white,
-                      0.15,
+                      isDark ? 0.05 : 0.15,
                     )!
-                  : Colors.white;
+                  : Theme.of(context).cardColor;
             }),
             foregroundColor: WidgetStateProperty.resolveWith((states) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
               return states.contains(WidgetState.selected)
                   ? Colors.white
-                  : Colors.black87;
+                  : (isDark ? Colors.white70 : Colors.black87);
             }),
-            side: WidgetStatePropertyAll(
-              BorderSide(color: Colors.grey.shade300),
-            ),
+            side: WidgetStateProperty.resolveWith((states) {
+              final isDark = Theme.of(context).brightness == Brightness.dark;
+              return BorderSide(
+                color: isDark ? Colors.white12 : Colors.grey.shade300,
+              );
+            }),
           ),
           segments: segments,
           selected: {selected},

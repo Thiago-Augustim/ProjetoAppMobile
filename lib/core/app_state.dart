@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../controllers/pomodoro_controller.dart';
 import '../controllers/provas_controller.dart';
 import '../controllers/tarefas_controller.dart';
+import '../controllers/theme_controller.dart';
 
 /// Injeta os controllers globais na árvore de widgets.
 ///
@@ -10,6 +11,7 @@ import '../controllers/tarefas_controller.dart';
 /// garantindo que todos os controllers vivam durante toda a sessão do app.
 class AppState extends InheritedWidget {
   const AppState({
+    required this.themeController,
     required this.pomodoroController,
     required this.tarefasController,
     required this.provasController,
@@ -17,6 +19,7 @@ class AppState extends InheritedWidget {
     super.key,
   });
 
+  final ThemeController themeController;
   final PomodoroController pomodoroController;
   final TarefasController tarefasController;
   final ProvasController provasController;

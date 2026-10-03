@@ -15,6 +15,8 @@ class PomodoroActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final fg = isDark ? Colors.white70 : const Color(0xFF334155);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -26,24 +28,26 @@ class PomodoroActionButtons extends StatelessWidget {
               height: 52,
               child: ElevatedButton.icon(
                 onPressed: onReset,
-                icon: const Icon(
+                icon: Icon(
                   Icons.replay_rounded,
                   size: 20,
-                  color: Color(0xFF334155),
+                  color: fg,
                 ),
-                label: const Text(
+                label: Text(
                   'Reiniciar',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF334155),
+                    color: fg,
                   ),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF334155),
+                  backgroundColor: Theme.of(context).cardColor,
+                  foregroundColor: fg,
                   elevation: 0,
-                  side: BorderSide(color: Colors.grey.shade300),
+                  side: BorderSide(
+                    color: isDark ? Colors.white12 : Colors.grey.shade300,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),

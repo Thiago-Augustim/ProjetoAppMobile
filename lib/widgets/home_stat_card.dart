@@ -16,10 +16,14 @@ class HomeStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final bg = isDark ? corTexto.withValues(alpha: 0.16) : corDeFundo;
+    final fg = isDark ? corTexto.withValues(alpha: 0.95) : corTexto;
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
       decoration: BoxDecoration(
-        color: corDeFundo,
+        color: bg,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
@@ -30,7 +34,7 @@ class HomeStatCard extends StatelessWidget {
             style: TextStyle(
               fontSize: 28,
               fontWeight: FontWeight.bold,
-              color: corTexto,
+              color: fg,
             ),
           ),
           const SizedBox(height: 4),
@@ -38,7 +42,7 @@ class HomeStatCard extends StatelessWidget {
             rotulo,
             style: TextStyle(
               fontSize: 13,
-              color: corTexto.withValues(alpha: 0.8),
+              color: fg.withValues(alpha: 0.8),
             ),
           ),
         ],

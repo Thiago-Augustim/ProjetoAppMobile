@@ -59,7 +59,7 @@ class PomodoroTimerCircle extends StatelessWidget {
               width: diameter - 26,
               height: diameter - 26,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).cardColor,
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(

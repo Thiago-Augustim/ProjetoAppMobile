@@ -16,13 +16,17 @@ class PomodoroModeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final primaryColor = Theme.of(context).colorScheme.primary;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(
+          color: isDark ? Colors.white12 : Colors.grey.shade300,
+        ),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.04),
@@ -61,7 +65,7 @@ class PomodoroModeSelector extends StatelessWidget {
                         : null,
                   ),
                   child: Center(
-                    child: _buildSegmentContent(mode, isSelected),
+                    child: _buildSegmentContent(mode, isSelected, isDark),
                   ),
                 ),
               ),
@@ -72,7 +76,11 @@ class PomodoroModeSelector extends StatelessWidget {
     );
   }
 
-  Widget _buildSegmentContent(PomodoroMode mode, bool isSelected) {
+  Widget _buildSegmentContent(
+    PomodoroMode mode,
+    bool isSelected,
+    bool isDark,
+  ) {
     if (mode == PomodoroMode.foco) {
       return Text.rich(
         TextSpan(
@@ -82,7 +90,9 @@ class PomodoroModeSelector extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: isSelected ? Colors.white : Colors.black87,
+                color: isSelected
+                    ? Colors.white
+                    : (isDark ? Colors.white70 : Colors.black87),
               ),
             ),
             TextSpan(
@@ -113,7 +123,9 @@ class PomodoroModeSelector extends StatelessWidget {
           style: TextStyle(
             fontSize: 13,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-            color: isSelected ? Colors.white : Colors.black87,
+            color: isSelected
+                ? Colors.white
+                : (isDark ? Colors.white70 : Colors.black87),
           ),
         ),
         const SizedBox(height: 2),
