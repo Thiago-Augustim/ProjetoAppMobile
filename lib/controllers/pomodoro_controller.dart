@@ -4,19 +4,12 @@ import 'package:flutter/foundation.dart';
 
 import '../models/pomodoro_mode.dart';
 
-/// Evento gerado quando o temporizador chega a zero.
-/// Mantido no controller até a página confirmar que exibiu o diálogo.
 class PomodoroCompletion {
   const PomodoroCompletion(this.modoCompletado);
 
   final PomodoroMode modoCompletado;
 }
 
-/// Gerencia o estado e a lógica do Temporizador Pomodoro.
-///
-/// Por viver fora da árvore de widgets, o [Timer] continua rodando mesmo
-/// quando o usuário navega para outra aba. Ao retornar, a página simplesmente
-/// lê o estado atual do controller.
 class PomodoroController extends ChangeNotifier {
   static const int ciclosPorSessao = 4;
 
@@ -27,18 +20,12 @@ class PomodoroController extends ChangeNotifier {
   int _ciclosCompletos = 0;
   PomodoroCompletion? _completion;
 
-  // ── Getters ────────────────────────────────────────────────────────────────
-
   PomodoroMode get modoAtual => _modoAtual;
   int get segundosRestantes => _segundosRestantes;
   bool get estaExecutando => _estaExecutando;
   int get ciclosCompletos => _ciclosCompletos;
 
-  /// Preenchido quando o temporizador chega a zero.
-  /// A página deve chamar [confirmarConclusao] após exibir o diálogo.
   PomodoroCompletion? get completion => _completion;
-
-  // ── Ações públicas ─────────────────────────────────────────────────────────
 
   void alternarExecucao() {
     _estaExecutando ? pausar() : iniciar();
@@ -79,6 +66,16 @@ class PomodoroController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void resetarSessao() {
+    _timer?.cancel();
+    _estaExecutando = false;
+    _modoAtual = PomodoroMode.foco;
+    _segundosRestantes = _modoAtual.duracaoSegundos;
+    _ciclosCompletos = 0;
+    _completion = null;
+    notifyListeners();
+  }
+
   void selecionarModo(PomodoroMode novoModo) {
     if (novoModo == _modoAtual) return;
     pausar();
@@ -87,7 +84,6 @@ class PomodoroController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Chamado pela página após exibir o diálogo de conclusão.
   void confirmarConclusao() {
     _completion = null;
     notifyListeners();

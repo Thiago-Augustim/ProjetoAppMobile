@@ -24,6 +24,7 @@ class AppBottomNavigationBar extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.check), label: 'Tarefas'),
         BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Promodoro'),
         BottomNavigationBarItem(icon: Icon(Icons.assignment), label: 'Provas'),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Ajustes'),
       ],
     );
   }

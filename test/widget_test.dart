@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:appestudos/controllers/auth_controller.dart';
 import 'package:appestudos/controllers/pomodoro_controller.dart';
 import 'package:appestudos/controllers/provas_controller.dart';
 import 'package:appestudos/controllers/tarefas_controller.dart';
@@ -13,6 +14,7 @@ void main() {
 
     await tester.pumpWidget(
       AppState(
+        authController: AuthController(),
         themeController: themeController,
         pomodoroController: PomodoroController(),
         tarefasController: TarefasController(),
@@ -41,14 +43,12 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
     expect(find.byIcon(Icons.dark_mode_outlined), findsOneWidget);
 
-    // Tap theme toggle button
     await tester.tap(find.byIcon(Icons.dark_mode_outlined));
     await tester.pumpAndSettle();
 
     expect(themeController.isDarkMode, isTrue);
     expect(find.byIcon(Icons.light_mode_outlined), findsOneWidget);
 
-    // Tap theme toggle button back to light
     await tester.tap(find.byIcon(Icons.light_mode_outlined));
     await tester.pumpAndSettle();
 
