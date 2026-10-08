@@ -47,6 +47,16 @@ class _ProvasPageState extends State<ProvasPage> {
     }
   }
 
+  Future<void> _editarProva(Prova provaAntiga) async {
+    final provaEditada = await showDialog<Prova>(
+      context: context,
+      builder: (_) => NovaProvaDialog(provaParaEditar: provaAntiga),
+    );
+    if (provaEditada != null && mounted) {
+      _controller!.editar(provaAntiga, provaEditada);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final controller = _controller!;
@@ -83,7 +93,10 @@ class _ProvasPageState extends State<ProvasPage> {
                     ),
                   ),
                   onDismissed: (_) => controller.remover(prova),
-                  child: ProvaCard(prova: prova),
+                  child: ProvaCard(
+                    prova: prova,
+                    onTap: () => _editarProva(prova),
+                  ),
                 );
               },
             ),

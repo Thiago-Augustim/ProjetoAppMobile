@@ -32,6 +32,13 @@ class ProvasController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void editar(Prova provaAntiga, Prova provaEditada) {
+    final index = _provas.indexOf(provaAntiga);
+    if (index == -1) return;
+    _provas[index] = provaEditada;
+    notifyListeners();
+  }
+
   void remover(Prova prova) {
     _provas.remove(prova);
     notifyListeners();

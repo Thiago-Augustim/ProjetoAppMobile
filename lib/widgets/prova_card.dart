@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../models/prova.dart';
 
 class ProvaCard extends StatelessWidget {
-  const ProvaCard({required this.prova, super.key});
+  const ProvaCard({required this.prova, this.onTap, super.key});
 
   final Prova prova;
+  final VoidCallback? onTap;
 
   int get _diasRestantes {
     final hoje = DateTime.now();
@@ -53,83 +54,90 @@ class ProvaCard extends StatelessWidget {
               : Colors.grey.shade300,
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    prova.titulo,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      prova.titulo,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 3),
-                  Text(
-                    prova.materia,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      color: Colors.blueGrey.shade300,
-                      fontSize: 14,
+                    const SizedBox(height: 3),
+                    Text(
+                      prova.materia,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        color: Colors.blueGrey.shade300,
+                        fontSize: 14,
+                      ),
                     ),
-                  ),
-                  if (prova.sala != null) ...[
-                    const SizedBox(height: 2),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.room_outlined,
-                          size: 14,
-                          color: Colors.blueGrey.shade300,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          prova.sala!,
-                          style: TextStyle(
+                    if (prova.sala != null) ...[
+                      const SizedBox(height: 2),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.room_outlined,
+                            size: 14,
                             color: Colors.blueGrey.shade300,
-                            fontSize: 13,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 4),
+                          Text(
+                            prova.sala!,
+                            style: TextStyle(
+                              color: Colors.blueGrey.shade300,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 3),
+                    Text(
+                      '${prova.data.day.toString().padLeft(2, '0')}/'
+                      '${prova.data.month.toString().padLeft(2, '0')}/'
+                      '${prova.data.year}',
+                      style: TextStyle(
+                        color: Colors.blueGrey.shade300,
+                        fontSize: 13,
+                      ),
                     ),
                   ],
-                  const SizedBox(height: 3),
-                  Text(
-                    '${prova.data.day.toString().padLeft(2, '0')}/'
-                    '${prova.data.month.toString().padLeft(2, '0')}/'
-                    '${prova.data.year}',
-                    style: TextStyle(
-                      color: Colors.blueGrey.shade300,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: _corDeFundoDaContagem,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                _textoDaContagem,
-                style: TextStyle(
-                  color: _corDaContagem,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-          ],
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: _corDeFundoDaContagem,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  _textoDaContagem,
+                  style: TextStyle(
+                    color: _corDaContagem,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

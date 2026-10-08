@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import '../models/prova.dart';
 
 class NovaProvaDialog extends StatefulWidget {
-  const NovaProvaDialog({super.key});
+  const NovaProvaDialog({this.provaParaEditar, super.key});
+
+  /// Quando informada, o diálogo abre preenchido com os dados dela e
+  /// passa a funcionar como edição em vez de criação.
+  final Prova? provaParaEditar;
 
   @override
   State<NovaProvaDialog> createState() => _NovaProvaDialogState();
@@ -11,10 +15,18 @@ class NovaProvaDialog extends StatefulWidget {
 
 class _NovaProvaDialogState extends State<NovaProvaDialog> {
   final _formKey = GlobalKey<FormState>();
-  final _tituloController = TextEditingController();
-  final _materiaController = TextEditingController();
-  final _salaController = TextEditingController();
-  DateTime? _data;
+  late final _tituloController = TextEditingController(
+    text: widget.provaParaEditar?.titulo,
+  );
+  late final _materiaController = TextEditingController(
+    text: widget.provaParaEditar?.materia,
+  );
+  late final _salaController = TextEditingController(
+    text: widget.provaParaEditar?.sala,
+  );
+  late DateTime? _data = widget.provaParaEditar?.data;
+
+  bool get _estaEditando => widget.provaParaEditar != null;
 
   @override
   void dispose() {
@@ -63,7 +75,7 @@ class _NovaProvaDialogState extends State<NovaProvaDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Nova prova'),
+      title: Text(_estaEditando ? 'Editar prova' : 'Nova prova'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -119,7 +131,10 @@ class _NovaProvaDialogState extends State<NovaProvaDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancelar'),
         ),
-        FilledButton(onPressed: _salvar, child: const Text('Adicionar')),
+        FilledButton(
+          onPressed: _salvar,
+          child: Text(_estaEditando ? 'Salvar' : 'Adicionar'),
+        ),
       ],
     );
   }
