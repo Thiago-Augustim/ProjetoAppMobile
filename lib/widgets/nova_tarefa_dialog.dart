@@ -86,7 +86,7 @@ class _NovaTarefaDialogState extends State<NovaTarefaDialog> {
                 },
               ),
               DropdownButtonFormField<Prioridade>(
-                value: _prioridade,
+                initialValue: _prioridade,
                 decoration: const InputDecoration(
                   labelText: 'Prioridade',
                 ),

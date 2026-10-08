@@ -19,7 +19,6 @@ class PromodoroPage extends StatefulWidget {
 class _PromodoroPageState extends State<PromodoroPage> {
   PomodoroController? _controller;
 
-  // Evita abrir dois diálogos se o evento chegar antes do frame ser renderizado.
   bool _dialogShowing = false;
 
   @override
@@ -32,8 +31,6 @@ class _PromodoroPageState extends State<PromodoroPage> {
       _controller!.addListener(_onControllerUpdate);
     }
 
-    // Ao entrar na página, verifica se o timer terminou enquanto o usuário
-    // estava em outra aba e exibe o diálogo no próximo frame.
     if (_controller!.completion != null && !_dialogShowing) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _onControllerUpdate());
     }
@@ -152,7 +149,6 @@ class _PromodoroPageState extends State<PromodoroPage> {
                           children: [
                             const SizedBox(height: 12),
 
-                            // Seletor de modo (Foco / Pausa Curta / Pausa Longa)
                             PomodoroModeSelector(
                               selectedMode: controller.modoAtual,
                               onModeSelected: controller.selecionarModo,
@@ -160,7 +156,6 @@ class _PromodoroPageState extends State<PromodoroPage> {
 
                             const Spacer(),
 
-                            // Relógio circular com progresso
                             PomodoroTimerCircle(
                               mode: controller.modoAtual,
                               remainingSeconds: controller.segundosRestantes,
@@ -171,7 +166,6 @@ class _PromodoroPageState extends State<PromodoroPage> {
 
                             const Spacer(),
 
-                            // Botões Reiniciar e Iniciar/Pausar
                             PomodoroActionButtons(
                               isRunning: controller.estaExecutando,
                               onStartPause: controller.alternarExecucao,

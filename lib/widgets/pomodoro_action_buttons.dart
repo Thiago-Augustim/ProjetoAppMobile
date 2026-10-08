@@ -22,7 +22,6 @@ class PomodoroActionButtons extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Row(
         children: [
-          // Reiniciar button
           Expanded(
             child: SizedBox(
               height: 52,
@@ -58,7 +57,6 @@ class PomodoroActionButtons extends StatelessWidget {
           ),
           const SizedBox(width: 16),
 
-          // Iniciar / Pausar button
           Expanded(
             child: SizedBox(
               height: 52,

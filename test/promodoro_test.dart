@@ -1,3 +1,4 @@
+import 'package:appestudos/controllers/auth_controller.dart';
 import 'package:appestudos/controllers/pomodoro_controller.dart';
 import 'package:appestudos/controllers/provas_controller.dart';
 import 'package:appestudos/controllers/tarefas_controller.dart';
@@ -15,6 +16,7 @@ Widget createTestWidget({
   ProvasController? provasController,
 }) {
   return AppState(
+    authController: AuthController(),
     themeController: themeController ?? ThemeController(),
     pomodoroController: pomodoroController ?? PomodoroController(),
     tarefasController: tarefasController ?? TarefasController(),
@@ -85,20 +87,16 @@ void main() {
     final controller = PomodoroController();
     await tester.pumpWidget(createTestWidget(pomodoroController: controller));
 
-    // Inicia o timer
     await tester.tap(find.text('Iniciar'));
     await tester.pump();
     expect(find.text('Pausar'), findsOneWidget);
 
-    // Avança 5 segundos — timer corre no controller
     await tester.pump(const Duration(seconds: 5));
     expect(find.text('24:55'), findsOneWidget);
 
-    // Simula saída e volta à tela (recria o widget com o mesmo controller)
     await tester.pumpWidget(createTestWidget(pomodoroController: controller));
     await tester.pump();
 
-    // Timer continua de onde parou
     expect(find.text('24:55'), findsOneWidget);
     expect(find.text('Pausar'), findsOneWidget);
 

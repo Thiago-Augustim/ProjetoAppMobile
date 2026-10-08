@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../core/app_routes.dart';
 import '../core/app_state.dart';
+import 'theme_toggle_button.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
   const AppHeader({required this.title, this.subtitle, super.key});
@@ -13,8 +15,6 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return AppBar(
       toolbarHeight: preferredSize.height,
       elevation: 0,
@@ -46,13 +46,17 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
+        const ThemeToggleButton(),
         IconButton(
-          tooltip: isDark ? 'Ativar modo claro' : 'Ativar modo escuro',
-          icon: Icon(
-            isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-          ),
+          tooltip: 'Sair',
+          icon: const Icon(Icons.logout),
           onPressed: () {
-            AppState.of(context).themeController.toggleTheme();
+            AppState.of(context).authController.logout();
+            Navigator.pushNamedAndRemoveUntil(
+              context,
+              AppRoutes.login,
+              (route) => false,
+            );
           },
         ),
         Padding(

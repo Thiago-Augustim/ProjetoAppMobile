@@ -36,7 +36,6 @@ class PomodoroTimerCircle extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Circular progress ring with animated transition
             TweenAnimationBuilder<double>(
               tween: Tween<double>(begin: progress, end: progress),
               duration: const Duration(milliseconds: 300),
@@ -54,7 +53,6 @@ class PomodoroTimerCircle extends StatelessWidget {
               },
             ),
 
-            // Inner white circular card
             Container(
               width: diameter - 26,
               height: diameter - 26,
@@ -72,7 +70,6 @@ class PomodoroTimerCircle extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Time display (e.g. 25:00)
                   Text(
                     _formatTime(remainingSeconds),
                     style: const TextStyle(
@@ -84,7 +81,6 @@ class PomodoroTimerCircle extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
 
-                  // Mode indicator (e.g. 🎯 Foco)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -131,7 +127,6 @@ class _PomodoroProgressPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = (size.width - strokeWidth) / 2;
 
-    // Background track ring
     final trackPaint = Paint()
       ..color = trackColor
       ..style = PaintingStyle.stroke
@@ -140,7 +135,6 @@ class _PomodoroProgressPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, trackPaint);
 
-    // Active progress arc
     if (progress > 0.0) {
       final progressPaint = Paint()
         ..color = primaryColor

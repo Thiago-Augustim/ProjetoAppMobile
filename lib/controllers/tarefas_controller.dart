@@ -3,16 +3,25 @@ import 'package:flutter/foundation.dart';
 import '../models/tarefa.dart';
 import '../widgets/tarefa_filters.dart';
 
-/// Gerencia a lista de tarefas e os filtros ativos.
-///
-/// Por viver fora da árvore de widgets, os dados persistem enquanto o app
-/// estiver aberto — independente de quantas vezes o usuário troque de aba.
 class TarefasController extends ChangeNotifier {
-  final List<Tarefa> _tarefas = [];
+  final Map<String, List<Tarefa>> _tarefasPorUsuario = {};
+
+  List<Tarefa> _tarefas = [];
   FiltroStatus _filtroStatus = FiltroStatus.todas;
   FiltroPrioridade _filtroPrioridade = FiltroPrioridade.todas;
 
-  // ── Getters ────────────────────────────────────────────────────────────────
+  void descartarDadosDe(String usuario) {
+    _tarefasPorUsuario.remove(usuario);
+  }
+
+  void trocarUsuario(String? usuario) {
+    _tarefas = usuario == null
+        ? []
+        : _tarefasPorUsuario.putIfAbsent(usuario, () => []);
+    _filtroStatus = FiltroStatus.todas;
+    _filtroPrioridade = FiltroPrioridade.todas;
+    notifyListeners();
+  }
 
   FiltroStatus get filtroStatus => _filtroStatus;
   FiltroPrioridade get filtroPrioridade => _filtroPrioridade;
@@ -41,8 +50,6 @@ class TarefasController extends ChangeNotifier {
     return '$quantidade $texto encontradas';
   }
 
-  // ── Resumo para o Dashboard (Home) ────────────────────────────────────────
-
   int get pendentesCount => _tarefas.where((t) => !t.concluida).length;
 
   int get concluidasCount => _tarefas.where((t) => t.concluida).length;
@@ -51,7 +58,6 @@ class TarefasController extends ChangeNotifier {
       .where((t) => !t.concluida && t.prioridade == Prioridade.alta)
       .length;
 
-  /// Tarefas pendentes com prazo definido, ordenadas pelas mais próximas.
   List<Tarefa> proximosPrazos({int limite = 5}) {
     final comPrazo = _tarefas
         .where((t) => !t.concluida && t.prazo != null)
@@ -59,8 +65,6 @@ class TarefasController extends ChangeNotifier {
       ..sort((a, b) => a.prazo!.compareTo(b.prazo!));
     return comPrazo.take(limite).toList();
   }
-
-  // ── Ações públicas ─────────────────────────────────────────────────────────
 
   void adicionar(Tarefa tarefa) {
     _tarefas.add(tarefa);
