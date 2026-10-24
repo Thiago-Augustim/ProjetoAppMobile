@@ -1,26 +1,55 @@
 import 'package:flutter/foundation.dart';
+import 'package:pocketbase/pocketbase.dart';
 
 import '../models/tarefa.dart';
+import '../services/pocketbase_service.dart';
 import '../widgets/tarefa_filters.dart';
 
 class TarefasController extends ChangeNotifier {
-  final Map<String, List<Tarefa>> _tarefasPorUsuario = {};
+  final PocketBase _pb = PocketBaseService.instance.pb;
 
   List<Tarefa> _tarefas = [];
+  bool _carregando = false;
   FiltroStatus _filtroStatus = FiltroStatus.todas;
   FiltroPrioridade _filtroPrioridade = FiltroPrioridade.todas;
 
+  bool get carregando => _carregando;
+
   void descartarDadosDe(String usuario) {
-    _tarefasPorUsuario.remove(usuario);
+    _tarefas = [];
+    notifyListeners();
   }
 
   void trocarUsuario(String? usuario) {
-    _tarefas = usuario == null
-        ? []
-        : _tarefasPorUsuario.putIfAbsent(usuario, () => []);
+    _tarefas = [];
     _filtroStatus = FiltroStatus.todas;
     _filtroPrioridade = FiltroPrioridade.todas;
     notifyListeners();
+
+    if (usuario != null) {
+      carregarTarefas();
+    }
+  }
+
+  Future<void> carregarTarefas() async {
+    final userId = PocketBaseService.instance.currentUserId;
+    if (userId == null) return;
+
+    _carregando = true;
+    notifyListeners();
+
+    try {
+      final records = await _pb.collection('tarefas').getFullList(
+        filter: 'user = "$userId"',
+        sort: '-created',
+      );
+      _tarefas = records.map((r) => Tarefa.fromRecord(r)).toList();
+    } catch (e) {
+      debugPrint('Erro ao carregar tarefas do PocketBase: $e');
+    } finally {
+      _carregando = false;
+      notifyListeners();
+    }
   }
 
   FiltroStatus get filtroStatus => _filtroStatus;
@@ -66,19 +95,54 @@ class TarefasController extends ChangeNotifier {
     return comPrazo.take(limite).toList();
   }
 
-  void adicionar(Tarefa tarefa) {
-    _tarefas.add(tarefa);
+  Future<void> adicionar(Tarefa tarefa) async {
+    _tarefas.insert(0, tarefa);
     notifyListeners();
+
+    final userId = PocketBaseService.instance.currentUserId;
+    if (userId != null) {
+      try {
+        final record = await _pb.collection('tarefas').create(
+          body: tarefa.toJson(userId: userId),
+        );
+        final index = _tarefas.indexOf(tarefa);
+        if (index != -1) {
+          _tarefas[index] = Tarefa.fromRecord(record);
+          notifyListeners();
+        }
+      } catch (e) {
+        debugPrint('Erro ao salvar tarefa no PocketBase: $e');
+      }
+    }
   }
 
-  void remover(Tarefa tarefa) {
+  Future<void> remover(Tarefa tarefa) async {
     _tarefas.remove(tarefa);
     notifyListeners();
+
+    if (tarefa.id != null) {
+      try {
+        await _pb.collection('tarefas').delete(tarefa.id!);
+      } catch (e) {
+        debugPrint('Erro ao excluir tarefa no PocketBase: $e');
+      }
+    }
   }
 
-  void alternarStatus(Tarefa tarefa, bool? concluida) {
+  Future<void> alternarStatus(Tarefa tarefa, bool? concluida) async {
     tarefa.concluida = concluida ?? false;
     notifyListeners();
+
+    if (tarefa.id != null) {
+      try {
+        await _pb.collection('tarefas').update(
+          tarefa.id!,
+          body: {'concluida': tarefa.concluida},
+        );
+      } catch (e) {
+        debugPrint('Erro ao atualizar status da tarefa no PocketBase: $e');
+      }
+    }
   }
 
   void setFiltroStatus(FiltroStatus status) {
@@ -93,3 +157,4 @@ class TarefasController extends ChangeNotifier {
     notifyListeners();
   }
 }
+

@@ -134,8 +134,8 @@ class _CadastroPageState extends State<CadastroPage> {
                         if (value == null || value.isEmpty) {
                           return 'Informe uma senha';
                         }
-                        if (value.length < 6) {
-                          return 'A senha deve ter ao menos 6 caracteres';
+                        if (value.length < 8) {
+                          return 'A senha deve ter ao menos 8 caracteres';
                         }
                         return null;
                       },
