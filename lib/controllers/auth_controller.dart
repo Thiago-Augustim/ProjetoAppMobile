@@ -4,7 +4,11 @@ import 'package:pocketbase/pocketbase.dart';
 import '../services/pocketbase_service.dart';
 
 class AuthController extends ChangeNotifier {
-  final PocketBase _pb = PocketBaseService.instance.pb;
+  AuthController({PocketBaseService? service})
+    : _service = service ?? PocketBaseService.instance;
+
+  final PocketBaseService _service;
+  PocketBase get _pb => _service.pb;
 
   String? _usuarioLogado;
   String? _senhaAtual;
