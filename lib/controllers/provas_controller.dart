@@ -5,7 +5,11 @@ import '../models/prova.dart';
 import '../services/pocketbase_service.dart';
 
 class ProvasController extends ChangeNotifier {
-  final PocketBase _pb = PocketBaseService.instance.pb;
+  ProvasController({PocketBaseService? service})
+    : _service = service ?? PocketBaseService.instance;
+
+  final PocketBaseService _service;
+  PocketBase get _pb => _service.pb;
 
   List<Prova> _provas = [];
   bool _carregando = false;
@@ -27,7 +31,7 @@ class ProvasController extends ChangeNotifier {
   }
 
   Future<void> carregarProvas() async {
-    final userId = PocketBaseService.instance.currentUserId;
+    final userId = _service.currentUserId;
     if (userId == null) return;
 
     _carregando = true;
@@ -60,7 +64,7 @@ class ProvasController extends ChangeNotifier {
     _provas.add(prova);
     notifyListeners();
 
-    final userId = PocketBaseService.instance.currentUserId;
+    final userId = _service.currentUserId;
     if (userId != null) {
       try {
         final record = await _pb.collection('provas').create(
