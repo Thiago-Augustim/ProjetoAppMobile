@@ -8,6 +8,7 @@ import 'controllers/theme_controller.dart';
 import 'core/app_routes.dart';
 import 'core/app_state.dart';
 import 'core/app_theme.dart';
+import 'services/pocketbase_service.dart';
 import 'pages/cadastro_page.dart';
 import 'pages/configuracoes_page.dart';
 import 'pages/home_page.dart';
@@ -28,11 +29,18 @@ class StudyApp extends StatefulWidget {
 }
 
 class _StudyAppState extends State<StudyApp> {
-  final _authController = AuthController();
+  // PocketBaseService injetado explicitamente nos controllers que precisam
+  // dele, em vez de cada um ir buscar o singleton por conta própria.
+  final _pocketBaseService = PocketBaseService.instance;
   final _themeController = ThemeController();
   final _pomodoroController = PomodoroController();
-  final _tarefasController = TarefasController();
-  final _provasController = ProvasController();
+  late final _authController = AuthController(service: _pocketBaseService);
+  late final _tarefasController = TarefasController(
+    service: _pocketBaseService,
+  );
+  late final _provasController = ProvasController(
+    service: _pocketBaseService,
+  );
 
   @override
   void initState() {
