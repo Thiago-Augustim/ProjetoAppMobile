@@ -6,7 +6,11 @@ import '../services/pocketbase_service.dart';
 import '../widgets/tarefa_filters.dart';
 
 class TarefasController extends ChangeNotifier {
-  final PocketBase _pb = PocketBaseService.instance.pb;
+  TarefasController({PocketBaseService? service})
+    : _service = service ?? PocketBaseService.instance;
+
+  final PocketBaseService _service;
+  PocketBase get _pb => _service.pb;
 
   List<Tarefa> _tarefas = [];
   bool _carregando = false;
@@ -32,7 +36,7 @@ class TarefasController extends ChangeNotifier {
   }
 
   Future<void> carregarTarefas() async {
-    final userId = PocketBaseService.instance.currentUserId;
+    final userId = _service.currentUserId;
     if (userId == null) return;
 
     _carregando = true;
@@ -99,7 +103,7 @@ class TarefasController extends ChangeNotifier {
     _tarefas.insert(0, tarefa);
     notifyListeners();
 
-    final userId = PocketBaseService.instance.currentUserId;
+    final userId = _service.currentUserId;
     if (userId != null) {
       try {
         final record = await _pb.collection('tarefas').create(
