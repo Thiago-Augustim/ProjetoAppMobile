@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
 import '../controllers/tarefas_controller.dart';
-import '../core/app_state.dart';
+import '../controllers/theme_controller.dart';
 import '../models/tarefa.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
@@ -10,29 +11,40 @@ import '../widgets/tarefa_card.dart';
 import '../widgets/tarefa_filters.dart';
 
 class TarefasPage extends StatefulWidget {
-  const TarefasPage({super.key});
+  const TarefasPage({
+    required this.tarefasController,
+    required this.authController,
+    required this.themeController,
+    super.key,
+  });
+
+  final TarefasController tarefasController;
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   State<TarefasPage> createState() => _TarefasPageState();
 }
 
 class _TarefasPageState extends State<TarefasPage> {
-  TarefasController? _controller;
+  @override
+  void initState() {
+    super.initState();
+    widget.tarefasController.addListener(_rebuild);
+  }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final newController = AppState.of(context).tarefasController;
-    if (_controller != newController) {
-      _controller?.removeListener(_rebuild);
-      _controller = newController;
-      _controller!.addListener(_rebuild);
+  void didUpdateWidget(TarefasPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tarefasController != widget.tarefasController) {
+      oldWidget.tarefasController.removeListener(_rebuild);
+      widget.tarefasController.addListener(_rebuild);
     }
   }
 
   @override
   void dispose() {
-    _controller?.removeListener(_rebuild);
+    widget.tarefasController.removeListener(_rebuild);
     super.dispose();
   }
 
@@ -44,18 +56,20 @@ class _TarefasPageState extends State<TarefasPage> {
       builder: (_) => const NovaTarefaDialog(),
     );
     if (tarefa != null && mounted) {
-      _controller!.adicionar(tarefa);
+      widget.tarefasController.adicionar(tarefa);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = _controller!;
+    final controller = widget.tarefasController;
 
     return Scaffold(
       appBar: AppHeader(
         title: 'Tarefas',
         subtitle: controller.resumo,
+        authController: widget.authController,
+        themeController: widget.themeController,
       ),
       body: Column(
         children: [

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
 import '../controllers/provas_controller.dart';
-import '../core/app_state.dart';
+import '../controllers/theme_controller.dart';
 import '../models/prova.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
@@ -9,29 +10,40 @@ import '../widgets/nova_prova_dialog.dart';
 import '../widgets/prova_card.dart';
 
 class ProvasPage extends StatefulWidget {
-  const ProvasPage({super.key});
+  const ProvasPage({
+    required this.provasController,
+    required this.authController,
+    required this.themeController,
+    super.key,
+  });
+
+  final ProvasController provasController;
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   State<ProvasPage> createState() => _ProvasPageState();
 }
 
 class _ProvasPageState extends State<ProvasPage> {
-  ProvasController? _controller;
+  @override
+  void initState() {
+    super.initState();
+    widget.provasController.addListener(_rebuild);
+  }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final newController = AppState.of(context).provasController;
-    if (_controller != newController) {
-      _controller?.removeListener(_rebuild);
-      _controller = newController;
-      _controller!.addListener(_rebuild);
+  void didUpdateWidget(ProvasPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.provasController != widget.provasController) {
+      oldWidget.provasController.removeListener(_rebuild);
+      widget.provasController.addListener(_rebuild);
     }
   }
 
   @override
   void dispose() {
-    _controller?.removeListener(_rebuild);
+    widget.provasController.removeListener(_rebuild);
     super.dispose();
   }
 
@@ -43,7 +55,7 @@ class _ProvasPageState extends State<ProvasPage> {
       builder: (_) => const NovaProvaDialog(),
     );
     if (prova != null && mounted) {
-      _controller!.adicionar(prova);
+      widget.provasController.adicionar(prova);
     }
   }
 
@@ -53,13 +65,13 @@ class _ProvasPageState extends State<ProvasPage> {
       builder: (_) => NovaProvaDialog(provaParaEditar: provaAntiga),
     );
     if (provaEditada != null && mounted) {
-      _controller!.editar(provaAntiga, provaEditada);
+      widget.provasController.editar(provaAntiga, provaEditada);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final controller = _controller!;
+    final controller = widget.provasController;
     final provas = controller.provas;
 
     return Scaffold(
@@ -68,6 +80,8 @@ class _ProvasPageState extends State<ProvasPage> {
         subtitle: controller.estaVazio
             ? null
             : '${provas.length} ${provas.length == 1 ? 'prova' : 'provas'} cadastradas',
+        authController: widget.authController,
+        themeController: widget.themeController,
       ),
       body: controller.estaVazio
           ? const Center(child: Text('Nenhuma prova cadastrada'))

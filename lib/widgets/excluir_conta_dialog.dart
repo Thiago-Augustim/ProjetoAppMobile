@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../core/app_state.dart';
+import '../controllers/auth_controller.dart';
 
 class ExcluirContaDialog extends StatefulWidget {
-  const ExcluirContaDialog({super.key});
+  const ExcluirContaDialog({required this.authController, super.key});
+
+  final AuthController authController;
 
   @override
   State<ExcluirContaDialog> createState() => _ExcluirContaDialogState();
@@ -56,7 +58,7 @@ class _ExcluirContaDialogState extends State<ExcluirContaDialog> {
       return;
     }
 
-    final auth = AppState.of(context).authController;
+    final auth = widget.authController;
 
     if (!auth.senhaConfere(_senhaController.text)) {
       setState(() => _erro = 'Senha incorreta.');

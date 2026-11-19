@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
+import '../controllers/theme_controller.dart';
 import '../core/app_routes.dart';
-import '../core/app_state.dart';
 import 'theme_toggle_button.dart';
 
 class AppHeader extends StatelessWidget implements PreferredSizeWidget {
-  const AppHeader({required this.title, this.subtitle, super.key});
+  const AppHeader({
+    required this.title,
+    required this.authController,
+    required this.themeController,
+    this.subtitle,
+    super.key,
+  });
 
   final String title;
   final String? subtitle;
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   Size get preferredSize => const Size.fromHeight(72);
@@ -46,12 +55,12 @@ class AppHeader extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
-        const ThemeToggleButton(),
+        ThemeToggleButton(themeController: themeController),
         IconButton(
           tooltip: 'Sair',
           icon: const Icon(Icons.logout),
           onPressed: () {
-            AppState.of(context).authController.logout();
+            authController.logout();
             Navigator.pushNamedAndRemoveUntil(
               context,
               AppRoutes.login,

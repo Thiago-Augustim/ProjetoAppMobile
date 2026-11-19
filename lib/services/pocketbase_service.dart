@@ -24,6 +24,7 @@ class PocketBaseService {
   PocketBase get pb => client;
 
   String? get currentUserId => client.authStore.record?.id;
-  String? get currentUsername => client.authStore.record?.getStringValue('username');
+  String? get currentUsername =>
+      client.authStore.record?.getStringValue('username');
   bool get isAuthenticated => client.authStore.isValid;
 }

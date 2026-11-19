@@ -1,21 +1,29 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
+import '../controllers/theme_controller.dart';
 import '../core/app_routes.dart';
-import '../core/app_state.dart';
 import '../widgets/alterar_senha_dialog.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
 import '../widgets/excluir_conta_dialog.dart';
 
 class ConfiguracoesPage extends StatelessWidget {
-  const ConfiguracoesPage({super.key});
+  const ConfiguracoesPage({
+    required this.authController,
+    required this.themeController,
+    super.key,
+  });
+
+  final AuthController authController;
+  final ThemeController themeController;
 
   Future<void> _alterarSenha(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
 
     final alterou = await showDialog<bool>(
       context: context,
-      builder: (_) => const AlterarSenhaDialog(),
+      builder: (_) => AlterarSenhaDialog(authController: authController),
     );
 
     if (alterou == true) {
@@ -31,7 +39,7 @@ class ConfiguracoesPage extends StatelessWidget {
 
     final excluiu = await showDialog<bool>(
       context: context,
-      builder: (_) => const ExcluirContaDialog(),
+      builder: (_) => ExcluirContaDialog(authController: authController),
     );
 
     if (excluiu != true) {
@@ -46,12 +54,14 @@ class ConfiguracoesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final usuario = AppState.of(context).authController.usuarioLogado ?? '';
+    final usuario = authController.usuarioLogado ?? '';
 
     return Scaffold(
-      appBar: const AppHeader(
+      appBar: AppHeader(
         title: 'Configurações',
         subtitle: 'Gerencie sua conta',
+        authController: authController,
+        themeController: themeController,
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),

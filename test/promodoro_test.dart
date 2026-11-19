@@ -1,29 +1,22 @@
 import 'package:appestudos/controllers/auth_controller.dart';
 import 'package:appestudos/controllers/pomodoro_controller.dart';
-import 'package:appestudos/controllers/provas_controller.dart';
-import 'package:appestudos/controllers/tarefas_controller.dart';
 import 'package:appestudos/controllers/theme_controller.dart';
-import 'package:appestudos/core/app_state.dart';
 import 'package:appestudos/core/app_theme.dart';
 import 'package:appestudos/pages/promodoro_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget createTestWidget({
+  AuthController? authController,
   ThemeController? themeController,
   PomodoroController? pomodoroController,
-  TarefasController? tarefasController,
-  ProvasController? provasController,
 }) {
-  return AppState(
-    authController: AuthController(),
-    themeController: themeController ?? ThemeController(),
-    pomodoroController: pomodoroController ?? PomodoroController(),
-    tarefasController: tarefasController ?? TarefasController(),
-    provasController: provasController ?? ProvasController(),
-    child: MaterialApp(
-      theme: AppTheme.light(),
-      home: const PromodoroPage(),
+  return MaterialApp(
+    theme: AppTheme.light(),
+    home: PromodoroPage(
+      pomodoroController: pomodoroController ?? PomodoroController(),
+      authController: authController ?? AuthController(),
+      themeController: themeController ?? ThemeController(),
     ),
   );
 }

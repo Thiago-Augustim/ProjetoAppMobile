@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../core/app_state.dart';
+import '../controllers/auth_controller.dart';
 
 class AlterarSenhaDialog extends StatefulWidget {
-  const AlterarSenhaDialog({super.key});
+  const AlterarSenhaDialog({required this.authController, super.key});
+
+  final AuthController authController;
 
   @override
   State<AlterarSenhaDialog> createState() => _AlterarSenhaDialogState();
@@ -32,7 +34,7 @@ class _AlterarSenhaDialogState extends State<AlterarSenhaDialog> {
       return;
     }
 
-    final auth = AppState.of(context).authController;
+    final auth = widget.authController;
     setState(() {
       _carregando = true;
       _erro = null;

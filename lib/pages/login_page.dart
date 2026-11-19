@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
+import '../controllers/theme_controller.dart';
 import '../core/app_routes.dart';
-import '../core/app_state.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  const LoginPage({
+    required this.authController,
+    required this.themeController,
+    super.key,
+  });
+
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -42,13 +50,12 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _entrar() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final auth = AppState.of(context).authController;
     setState(() {
       _carregando = true;
       _erro = null;
     });
 
-    final erro = await auth.login(
+    final erro = await widget.authController.login(
       _usuarioController.text,
       _senhaController.text,
     );
@@ -76,7 +83,10 @@ class _LoginPageState extends State<LoginPage> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        actions: const [ThemeToggleButton(), SizedBox(width: 8)],
+        actions: [
+          ThemeToggleButton(themeController: widget.themeController),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: Center(

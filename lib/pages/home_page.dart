@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
 import '../controllers/pomodoro_controller.dart';
 import '../controllers/provas_controller.dart';
 import '../controllers/tarefas_controller.dart';
-import '../core/app_state.dart';
+import '../controllers/theme_controller.dart';
+import '../models/pomodoro_mode.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
 import '../widgets/home_proxima_prova_tile.dart';
@@ -11,46 +13,56 @@ import '../widgets/home_proximo_prazo_tile.dart';
 import '../widgets/home_stat_card.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({
+    required this.tarefasController,
+    required this.provasController,
+    required this.authController,
+    required this.themeController,
+    this.pomodoroController,
+    super.key,
+  });
+
+  final TarefasController tarefasController;
+  final ProvasController provasController;
+  final PomodoroController? pomodoroController;
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  TarefasController? _tarefasController;
-  PomodoroController? _pomodoroController;
-  ProvasController? _provasController;
+  @override
+  void initState() {
+    super.initState();
+    widget.tarefasController.addListener(_rebuild);
+    widget.provasController.addListener(_rebuild);
+    widget.pomodoroController?.addListener(_rebuild);
+  }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final appState = AppState.of(context);
-
-    if (_tarefasController != appState.tarefasController) {
-      _tarefasController?.removeListener(_rebuild);
-      _tarefasController = appState.tarefasController;
-      _tarefasController!.addListener(_rebuild);
+  void didUpdateWidget(HomePage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tarefasController != widget.tarefasController) {
+      oldWidget.tarefasController.removeListener(_rebuild);
+      widget.tarefasController.addListener(_rebuild);
     }
-
-    if (_pomodoroController != appState.pomodoroController) {
-      _pomodoroController?.removeListener(_rebuild);
-      _pomodoroController = appState.pomodoroController;
-      _pomodoroController!.addListener(_rebuild);
+    if (oldWidget.provasController != widget.provasController) {
+      oldWidget.provasController.removeListener(_rebuild);
+      widget.provasController.addListener(_rebuild);
     }
-
-    if (_provasController != appState.provasController) {
-      _provasController?.removeListener(_rebuild);
-      _provasController = appState.provasController;
-      _provasController!.addListener(_rebuild);
+    if (oldWidget.pomodoroController != widget.pomodoroController) {
+      oldWidget.pomodoroController?.removeListener(_rebuild);
+      widget.pomodoroController?.addListener(_rebuild);
     }
   }
 
   @override
   void dispose() {
-    _tarefasController?.removeListener(_rebuild);
-    _pomodoroController?.removeListener(_rebuild);
-    _provasController?.removeListener(_rebuild);
+    widget.tarefasController.removeListener(_rebuild);
+    widget.provasController.removeListener(_rebuild);
+    widget.pomodoroController?.removeListener(_rebuild);
     super.dispose();
   }
 
@@ -86,8 +98,7 @@ class _HomePageState extends State<HomePage> {
     return '$diaDaSemana, ${hoje.day} de $mes de ${hoje.year}';
   }
 
-  String get _segundosFormatados {
-    final segundos = _pomodoroController!.segundosRestantes;
+  String _formatarSegundos(int segundos) {
     final minutos = (segundos ~/ 60).toString().padLeft(2, '0');
     final restante = (segundos % 60).toString().padLeft(2, '0');
     return '$minutos:$restante';
@@ -95,14 +106,24 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final tarefas = _tarefasController!;
-    final pomodoro = _pomodoroController!;
-    final provas = _provasController!;
+    final tarefas = widget.tarefasController;
+    final provas = widget.provasController;
+    final pomodoro = widget.pomodoroController;
+
+    final modoPomodoro = pomodoro?.modoAtual ?? PomodoroMode.foco;
+    final segundosRestantes =
+        pomodoro?.segundosRestantes ?? PomodoroMode.foco.duracaoSegundos;
+    final pomodoroExecutando = pomodoro?.estaExecutando ?? false;
+
     final proximosPrazos = tarefas.proximosPrazos();
     final proximasProvas = provas.proximas();
 
     return Scaffold(
-      appBar: const AppHeader(title: 'Início'),
+      appBar: AppHeader(
+        title: 'Início',
+        authController: widget.authController,
+        themeController: widget.themeController,
+      ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
@@ -192,22 +213,22 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _segundosFormatados,
+                      _formatarSegundos(segundosRestantes),
                       style: const TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      pomodoro.estaExecutando
-                          ? '${pomodoro.modoAtual.titulo} · em andamento'
-                          : '${pomodoro.modoAtual.titulo} · pausado',
+                      pomodoroExecutando
+                          ? '${modoPomodoro.titulo} · em andamento'
+                          : '${modoPomodoro.titulo} · pausado',
                       style: TextStyle(color: Colors.blueGrey.shade300),
                     ),
                   ],
                 ),
                 Icon(
-                  pomodoro.modoAtual.icone,
+                  modoPomodoro.icone,
                   color: Theme.of(context).colorScheme.primary,
                   size: 32,
                 ),

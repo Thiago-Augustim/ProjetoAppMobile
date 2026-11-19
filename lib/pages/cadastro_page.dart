@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
-import '../core/app_state.dart';
+import '../controllers/auth_controller.dart';
+import '../controllers/theme_controller.dart';
 import '../widgets/theme_toggle_button.dart';
 
 class CadastroPage extends StatefulWidget {
-  const CadastroPage({super.key});
+  const CadastroPage({
+    required this.authController,
+    required this.themeController,
+    super.key,
+  });
+
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   State<CadastroPage> createState() => _CadastroPageState();
@@ -31,14 +39,16 @@ class _CadastroPageState extends State<CadastroPage> {
   Future<void> _cadastrar() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final auth = AppState.of(context).authController;
     setState(() {
       _carregando = true;
       _erro = null;
     });
 
     final usuario = _usuarioController.text.trim();
-    final erro = await auth.cadastrar(usuario, _senhaController.text);
+    final erro = await widget.authController.cadastrar(
+      usuario,
+      _senhaController.text,
+    );
 
     if (!mounted) return;
 
@@ -62,7 +72,10 @@ class _CadastroPageState extends State<CadastroPage> {
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
-        actions: const [ThemeToggleButton(), SizedBox(width: 8)],
+        actions: [
+          ThemeToggleButton(themeController: widget.themeController),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SafeArea(
         child: Center(
@@ -79,8 +92,9 @@ class _CadastroPageState extends State<CadastroPage> {
                     Text(
                       'Criar conta',
                       textAlign: TextAlign.center,
-                      style: theme.textTheme.headlineMedium
-                          ?.copyWith(fontWeight: FontWeight.bold),
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -119,8 +133,9 @@ class _CadastroPageState extends State<CadastroPage> {
                         prefixIcon: const Icon(Icons.lock_outline),
                         border: const OutlineInputBorder(),
                         suffixIcon: IconButton(
-                          tooltip:
-                              _ocultarSenha ? 'Mostrar senha' : 'Ocultar senha',
+                          tooltip: _ocultarSenha
+                              ? 'Mostrar senha'
+                              : 'Ocultar senha',
                           icon: Icon(
                             _ocultarSenha
                                 ? Icons.visibility_outlined
@@ -182,8 +197,9 @@ class _CadastroPageState extends State<CadastroPage> {
                     ),
                     const SizedBox(height: 8),
                     TextButton(
-                      onPressed:
-                          _carregando ? null : () => Navigator.pop(context),
+                      onPressed: _carregando
+                          ? null
+                          : () => Navigator.pop(context),
                       child: const Text('Já tenho conta'),
                     ),
                   ],

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../controllers/auth_controller.dart';
 import '../controllers/pomodoro_controller.dart';
-import '../core/app_state.dart';
+import '../controllers/theme_controller.dart';
 import '../models/pomodoro_mode.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
@@ -10,41 +11,58 @@ import '../widgets/pomodoro_mode_selector.dart';
 import '../widgets/pomodoro_timer_circle.dart';
 
 class PromodoroPage extends StatefulWidget {
-  const PromodoroPage({super.key});
+  const PromodoroPage({
+    required this.pomodoroController,
+    required this.authController,
+    required this.themeController,
+    super.key,
+  });
+
+  final PomodoroController pomodoroController;
+  final AuthController authController;
+  final ThemeController themeController;
 
   @override
   State<PromodoroPage> createState() => _PromodoroPageState();
 }
 
 class _PromodoroPageState extends State<PromodoroPage> {
-  PomodoroController? _controller;
-
   bool _dialogShowing = false;
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final newController = AppState.of(context).pomodoroController;
-    if (_controller != newController) {
-      _controller?.removeListener(_onControllerUpdate);
-      _controller = newController;
-      _controller!.addListener(_onControllerUpdate);
+  void initState() {
+    super.initState();
+    widget.pomodoroController.addListener(_onControllerUpdate);
+    if (widget.pomodoroController.completion != null && !_dialogShowing) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _onControllerUpdate(),
+      );
     }
+  }
 
-    if (_controller!.completion != null && !_dialogShowing) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => _onControllerUpdate());
+  @override
+  void didUpdateWidget(PromodoroPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.pomodoroController != widget.pomodoroController) {
+      oldWidget.pomodoroController.removeListener(_onControllerUpdate);
+      widget.pomodoroController.addListener(_onControllerUpdate);
+      if (widget.pomodoroController.completion != null && !_dialogShowing) {
+        WidgetsBinding.instance.addPostFrameCallback(
+          (_) => _onControllerUpdate(),
+        );
+      }
     }
   }
 
   @override
   void dispose() {
-    _controller?.removeListener(_onControllerUpdate);
+    widget.pomodoroController.removeListener(_onControllerUpdate);
     super.dispose();
   }
 
   void _onControllerUpdate() {
     if (!mounted) return;
-    final completion = _controller?.completion;
+    final completion = widget.pomodoroController.completion;
     if (completion != null && !_dialogShowing) {
       _dialogShowing = true;
       _exibirDialogoConclusao(completion);
@@ -52,7 +70,7 @@ class _PromodoroPageState extends State<PromodoroPage> {
   }
 
   void _exibirDialogoConclusao(PomodoroCompletion completion) {
-    final controller = _controller!;
+    final controller = widget.pomodoroController;
 
     final bool foiModoFoco = completion.modoCompletado == PomodoroMode.foco;
     final bool isPausaLonga = foiModoFoco &&
@@ -126,16 +144,19 @@ class _PromodoroPageState extends State<PromodoroPage> {
 
   @override
   Widget build(BuildContext context) {
+    final controller = widget.pomodoroController;
+
     return Scaffold(
-      appBar: const AppHeader(
+      appBar: AppHeader(
         title: 'Temporizador Pomodoro',
         subtitle: 'Concentre-se. Descanse. Repita.',
+        authController: widget.authController,
+        themeController: widget.themeController,
       ),
       body: SafeArea(
         child: ListenableBuilder(
-          listenable: AppState.of(context).pomodoroController,
+          listenable: controller,
           builder: (context, _) {
-            final controller = AppState.of(context).pomodoroController;
             return LayoutBuilder(
               builder: (context, constraints) {
                 return SingleChildScrollView(
