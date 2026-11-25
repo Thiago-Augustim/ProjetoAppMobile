@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:http/http.dart' as http;
 import 'package:pocketbase/pocketbase.dart';
 
 import '../models/tarefa.dart';
@@ -106,12 +107,27 @@ class TarefasController extends ChangeNotifier {
     final userId = _service.currentUserId;
     if (userId != null) {
       try {
+        final files = <http.MultipartFile>[
+          if (tarefa.fotoBytes != null && tarefa.fotoBytes!.isNotEmpty)
+            http.MultipartFile.fromBytes(
+              'foto',
+              tarefa.fotoBytes!,
+              filename:
+                  tarefa.fotoNome ??
+                  'tarefa_${DateTime.now().millisecondsSinceEpoch}.jpg',
+            ),
+        ];
+
         final record = await _pb.collection('tarefas').create(
           body: tarefa.toJson(userId: userId),
+          files: files,
         );
         final index = _tarefas.indexOf(tarefa);
         if (index != -1) {
-          _tarefas[index] = Tarefa.fromRecord(record);
+          _tarefas[index] = Tarefa.fromRecord(
+            record,
+            fotoBytes: tarefa.fotoBytes,
+          );
           notifyListeners();
         }
       } catch (e) {
@@ -161,4 +177,3 @@ class TarefasController extends ChangeNotifier {
     notifyListeners();
   }
 }
-

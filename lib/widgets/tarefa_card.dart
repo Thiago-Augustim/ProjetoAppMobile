@@ -45,6 +45,68 @@ class TarefaCard extends StatelessWidget {
     }
   }
 
+  Widget _construirImagem({BoxFit fit = BoxFit.cover}) {
+    if (tarefa.fotoBytes != null && tarefa.fotoBytes!.isNotEmpty) {
+      return Image.memory(
+        tarefa.fotoBytes!,
+        fit: fit,
+      );
+    }
+    return Image.network(
+      tarefa.fotoUrl!,
+      fit: fit,
+      errorBuilder: (_, _, _) => const Center(
+        child: Icon(Icons.broken_image_outlined),
+      ),
+    );
+  }
+
+  void _abrirFotoAmpliada(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        key: const Key('dialog_foto_ampliada_tarefa'),
+        clipBehavior: Clip.antiAlias,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 8, 8),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      tarefa.titulo,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: 'Fechar',
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(ctx).pop(),
+                  ),
+                ],
+              ),
+            ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 420),
+              child: InteractiveViewer(
+                child: _construirImagem(fit: BoxFit.contain),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -102,6 +164,24 @@ class TarefaCard extends StatelessWidget {
                   ],
                 ),
               ),
+              if (tarefa.possuiFoto) ...[
+                const SizedBox(width: 8),
+                Tooltip(
+                  message: 'Ver foto anexada',
+                  child: GestureDetector(
+                    key: const Key('miniatura_foto_tarefa'),
+                    onTap: () => _abrirFotoAmpliada(context),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: SizedBox(
+                        width: 42,
+                        height: 42,
+                        child: _construirImagem(),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
               const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),

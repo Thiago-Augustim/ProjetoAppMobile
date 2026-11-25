@@ -4,6 +4,7 @@ import '../controllers/auth_controller.dart';
 import '../controllers/tarefas_controller.dart';
 import '../controllers/theme_controller.dart';
 import '../models/tarefa.dart';
+import '../services/camera_service.dart';
 import '../widgets/app_bottom_navigation_bar.dart';
 import '../widgets/app_header.dart';
 import '../widgets/nova_tarefa_dialog.dart';
@@ -15,12 +16,14 @@ class TarefasPage extends StatefulWidget {
     required this.tarefasController,
     required this.authController,
     required this.themeController,
+    this.cameraService,
     super.key,
   });
 
   final TarefasController tarefasController;
   final AuthController authController;
   final ThemeController themeController;
+  final CameraService? cameraService;
 
   @override
   State<TarefasPage> createState() => _TarefasPageState();
@@ -53,7 +56,7 @@ class _TarefasPageState extends State<TarefasPage> {
   Future<void> _adicionarTarefa() async {
     final tarefa = await showDialog<Tarefa>(
       context: context,
-      builder: (_) => const NovaTarefaDialog(),
+      builder: (_) => NovaTarefaDialog(cameraService: widget.cameraService),
     );
     if (tarefa != null && mounted) {
       widget.tarefasController.adicionar(tarefa);
